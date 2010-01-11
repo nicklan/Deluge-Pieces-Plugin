@@ -201,7 +201,14 @@ class PiecesTab(Tab):
         plen = len(stat.pieces)
         self._ms.setNumSquares(plen)
         if (plen <= 0):
-            return
+            if (stat.num_pieces == 0):
+                return
+            if (stat.state == stat.seeding or
+                stat.state == stat.finished):
+                self._ms.setNumSquares(stat.num_pieces)
+                for i in range (0,stat.num_pieces):
+                    self._ms.setSquareColor(i,1)
+                return
 
         peers = tor.handle.get_peer_info()
         curdl = []
