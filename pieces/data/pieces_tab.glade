@@ -49,4 +49,59 @@
       </widget>
     </child>
   </widget>
+  <widget class="GtkMenu" id="priority_menu">
+    <property name="visible">True</property>
+    <child>
+      <widget class="GtkImageMenuItem" id="normal_item">
+        <property name="label" translatable="yes">Normal</property>
+        <property name="visible">True</property>
+        <property name="use_stock">False</property>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image1">
+            <property name="visible">True</property>
+            <property name="stock">gtk-yes</property>
+          </widget>
+        </child>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkImageMenuItem" id="high_item">
+        <property name="label" translatable="yes">High</property>
+        <property name="visible">True</property>
+        <property name="use_stock">False</property>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image2">
+            <property name="visible">True</property>
+            <property name="stock">gtk-go-up</property>
+          </widget>
+        </child>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkImageMenuItem" id="higher_item">
+        <property name="label" translatable="yes">Higher</property>
+        <property name="visible">True</property>
+        <property name="use_stock">False</property>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image4">
+            <property name="visible">True</property>
+            <property name="stock">gtk-sort-ascending</property>
+          </widget>
+        </child>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkImageMenuItem" id="highest_item">
+        <property name="label" translatable="yes">Highest</property>
+        <property name="visible">True</property>
+        <property name="use_stock">False</property>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image3">
+            <property name="visible">True</property>
+            <property name="stock">gtk-goto-top</property>
+          </widget>
+        </child>
+      </widget>
+    </child>
+  </widget>
 </glade-interface>

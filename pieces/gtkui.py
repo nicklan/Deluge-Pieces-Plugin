@@ -49,16 +49,83 @@ from deluge.ui.gtkui.torrentdetails import Tab
 from common import get_resource
 
 class MultiSquare(gtk.DrawingArea):
-    def __init__(self, numSquares=0, colors=['#000000']):
+    def __init__(self, numSquares=0, colors=['#000000'],menu=None):
         gtk.DrawingArea.__init__(self)
         self.numSquares = numSquares
+        self.menu = menu
 
+        for item in menu.get_children():
+            item.connect("activate",self.priority_activate)
+
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         colormap = self.get_colormap()
         self.colors = []
         for color in colors:
             self.colors.append(colormap.alloc_color(color, True, True))
         self.colorIndex = {}
         self.connect("expose_event", self.expose)
+        self.set_property("has-tooltip",True)
+        self.connect("query-tooltip",self.qtt)
+        self.connect("button-press-event",self.bpe)
+
+    def qtt(self,widget, x, y, keyboard_mode, tooltip):
+        if (self.window == None):
+            return
+        rect = self.get_allocation()
+        numAcross =  rect.width / 12
+        row = y / 12
+        col = x / 12
+        sq = row*numAcross+col
+        if (sq >= self.numSquares):
+            return False
+        pri = self._handle.piece_priority(sq)        
+        pris = {
+            0: lambda : "Do Not Download",
+            1: lambda : "Normal",
+            2: lambda : "High",
+            5: lambda : "Higher",
+            7: lambda : "Highest"
+            }[pri]()
+        tooltip.set_text("Piece: %i (%s)" % (sq,pris))
+        return True
+
+    def bpe(self, widget, event):
+        if (self.window == None):
+            return
+        if (event.button == 3 and self.menu != None):
+            self._priox = event.x
+            self._prioy = event.y
+            self.menu.popup(None,
+                            None,
+                            None,
+                            event.button,
+                            gtk.get_current_event_time())
+        return False
+
+    def priority_activate(self, widget):
+        if (self.window == None):
+            return
+        rect = self.get_allocation()
+        numAcross =  rect.width / 12
+        row = int(self._prioy) / 12
+        col = int(self._priox) / 12
+        sq = row*numAcross+col
+        if (sq >= self.numSquares):
+            return False
+        name = widget.get_name()
+        if (name == "normal_item"):
+            log.debug("set %i to normal"%sq)
+            self._handle.piece_priority(sq,1)
+        elif (name == "high_item"):
+            log.debug("set %i to high"%sq)
+            self._handle.piece_priority(sq,2)
+        elif (name == "higher_item"):
+            log.debug("set %i to high"%sq)
+            self._handle.piece_priority(sq,5)
+        elif (name == "highest_item"):
+            log.debug("set %i to highest"%sq)
+            self._handle.piece_priority(sq,7)
+        return False
 
     def setSquareColor(self,square,color):
         try:
@@ -98,6 +165,9 @@ class MultiSquare(gtk.DrawingArea):
         if (self.numSquares != numSquares):
             self.numSquares = numSquares
             self.queue_draw()
+
+    def setTorrentHandle(self,handle):
+        self._handle = handle
 
     def setColors(self,colors):
         colormap = self.get_colormap()
@@ -164,15 +234,22 @@ class PiecesTab(Tab):
         self._child_widget = glade_tab.get_widget("pieces_tab")
         self._tab_label = glade_tab.get_widget("pieces_tab_label")
 
-        self._ms = MultiSquare(0,['#000000','#FF0000','#0000FF'])
+        self._ms = MultiSquare(0,['#000000','#FF0000','#0000FF'],glade_tab.get_widget("priority_menu"))
         vp = gtk.Viewport()
         vp.set_shadow_type(gtk.SHADOW_NONE)
+        #self._child_widget.connect("motion-notify-event",self.motion)
+        #self._child_widget.set_events(vp.get_events() |
+        #                              gtk.gdk.MOTION_NOTIFY)
         vp.add(self._ms)
         self._child_widget.add(vp)
         self._child_widget.get_parent().show_all()
 
+
         self._tid_cache = ""
         self._nump_cache = 0
+
+    def motion(self,widget,event):
+        print "MOTION"
 
     def setColors(self,colors):
         self._ms.setColors(colors)
@@ -197,6 +274,7 @@ class PiecesTab(Tab):
 
         self._tid_cache = selected
         self._nump_cache = stat.num_pieces
+        self._ms.setTorrentHandle(tor.handle)
 
         plen = len(stat.pieces)
         self._ms.setNumSquares(plen)
