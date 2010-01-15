@@ -42,7 +42,7 @@ from setuptools import setup
 __plugin_name__ = "Pieces"
 __author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
-__version__ = "0.1"
+__version__ = "0.2"
 __url__ = "http://eecs.berkeley.edu/~nickl/pieces"
 __license__ = "GPLv3"
 __description__ = "Add a tab showing the status of each piece of the selected torrent"
