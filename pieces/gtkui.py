@@ -63,9 +63,6 @@ class MultiSquare(gtk.DrawingArea):
         self.colors = []
         for color in colors:
             self.colors.append(colormap.alloc_color(color, True, True))
-        self.selected = []
-        for i in range(0,self.numSquares):
-            self.selected.append(False)
         self.colorIndex = {}
         self.selected = {}
 
