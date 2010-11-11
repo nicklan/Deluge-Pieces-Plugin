@@ -2,6 +2,7 @@
 # gtkui.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
+# Copyright (C) 2010 Jens Timmerman <jens.timmerman@gmail.com>
 #
 # Basic plugin template created by:
 # Copyright (C) 2008 Martijn Voncken <mvoncken@gmail.com>
@@ -129,9 +130,6 @@ class MultiSquare(gtk.DrawingArea):
             if index < self.numSquares:
                 self.selected[index] = True
             self.queue_draw()
-        #self.emit("expose-event",  gtk.gdk.Event(gtk.gdk.EXPOSE))
-
-
         return False
 
     def bre(self, widget, event):
@@ -250,6 +248,7 @@ class MultiSquare(gtk.DrawingArea):
             try:
                 #if this square is selected,visualize this
                 if self.selected[i]:
+                    #todo: this could probably be optimized
                     context.set_foreground( self.get_colormap().alloc_color('#000000', True, True))
                     self.window.draw_rectangle(context, True,x,y,11,11)
                     setColor = True
