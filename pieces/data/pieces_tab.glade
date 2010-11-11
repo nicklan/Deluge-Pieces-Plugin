@@ -59,7 +59,7 @@
         <child internal-child="image">
           <widget class="GtkImage" id="image0">
             <property name="visible">True</property>
-            <property name="stock">gtk-yes</property>
+            <property name="stock">gtk-no</property>
           </widget>
         </child>
       </widget>
