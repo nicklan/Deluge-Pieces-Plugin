@@ -53,29 +53,49 @@ class MultiSquare(gtk.DrawingArea):
         gtk.DrawingArea.__init__(self)
         self.numSquares = numSquares
         self.menu = menu
+        self.button1_in = False
 
         for item in menu.get_children():
             item.connect("activate",self.priority_activate)
 
-        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_RELEASE_MASK | gtk.gdk.BUTTON1_MOTION_MASK)
         colormap = self.get_colormap()
         self.colors = []
         for color in colors:
             self.colors.append(colormap.alloc_color(color, True, True))
+        self.selected = []
+        for i in range(0,self.numSquares):
+            self.selected.append(False)
         self.colorIndex = {}
+        self.selected = {}
+
         self.connect("expose_event", self.expose)
         self.set_property("has-tooltip",True)
         self.connect("query-tooltip",self.qtt)
         self.connect("button-press-event",self.bpe)
+        self.connect("button-release-event",self.bre)
+        self.connect('motion-notify-event', self.mne)
 
-    def qtt(self,widget, x, y, keyboard_mode, tooltip):
+    def resetSelected(self):
+        '''resets the selected squares'''
+        self.selected = {}
+
+    def mne(self, widget, event):
+        '''called on motion notify event'''
         if (self.window == None):
             return
-        rect = self.get_allocation()
-        numAcross =  rect.width / 12
-        row = y / 12
-        col = x / 12
-        sq = row*numAcross+col
+        if (self.button1_in):
+            #set the draged over square selected
+            self.selected[self.getIndex(event.x, event.y)] = True
+            self.queue_draw()
+        return True
+
+
+    def qtt(self,widget, x, y, keyboard_mode, tooltip):
+        '''called on query tooltip'''
+        if (self.window == None):
+            return
+        sq = self.getIndex(x,y)
         if (sq >= self.numSquares):
             return False
         pri = self._handle.piece_priority(sq)        
@@ -90,6 +110,7 @@ class MultiSquare(gtk.DrawingArea):
         return True
 
     def bpe(self, widget, event):
+        '''called on button press event'''
         if (self.window == None):
             return
         if (event.button == 3 and self.menu != None):
@@ -100,31 +121,58 @@ class MultiSquare(gtk.DrawingArea):
                             None,
                             event.button,
                             gtk.get_current_event_time())
+
+        #set button in true
+        #clear the current selection and set this square as selected
+        if(event.button == 1):
+            self.button1_in = True
+            for i in range(0,self.numSquares):
+                self.selected[i]=False
+            index = self.getIndex(event.x, event.y)
+            if index < self.numSquares:
+                self.selected[index] = True
+            self.queue_draw()
+        #self.emit("expose-event",  gtk.gdk.Event(gtk.gdk.EXPOSE))
+
+
         return False
 
-    def priority_activate(self, widget):
+    def bre(self, widget, event):
+        '''called on button release event'''
         if (self.window == None):
             return
+        if(event.button == 1):
+            self.button1_in = False
+        return False
+
+    def getIndex(self,x,y):
+        '''returns the index of the square on position x,y'''
         rect = self.get_allocation()
         numAcross =  rect.width / 12
-        row = int(self._prioy) / 12
-        col = int(self._priox) / 12
-        sq = row*numAcross+col
-        if (sq >= self.numSquares):
-            return False
+        row = int(y) / 12
+        col = int(x) / 12
+        return row*numAcross+col
+
+    def priority_activate(self, widget):
+        '''set the priorities of the selected squares'''
+        if (self.window == None):
+            return
         name = widget.get_name()
         if (name == "normal_item"):
-            log.debug("set %i to normal"%sq)
-            self._handle.piece_priority(sq,1)
+            priority = 1
         elif (name == "high_item"):
-            log.debug("set %i to high"%sq)
-            self._handle.piece_priority(sq,2)
+            priority = 2
         elif (name == "higher_item"):
-            log.debug("set %i to high"%sq)
-            self._handle.piece_priority(sq,5)
+            priority = 5
         elif (name == "highest_item"):
-            log.debug("set %i to highest"%sq)
-            self._handle.piece_priority(sq,7)
+            priority = 7
+        elif (name == "no_item"):
+            priority = 0
+
+        #update every selected piece
+        for i in self.selected:
+            if self.selected[i]: # if actually selected
+                self._handle.piece_priority(i,priority)
         return False
 
     def setSquareColor(self,square,color):
@@ -203,6 +251,15 @@ class MultiSquare(gtk.DrawingArea):
         
 	for i in range(0,self.numSquares):
             try:
+                #if this square is selected,visualize this
+                if self.selected[i]:
+                    context.set_foreground( self.get_colormap().alloc_color('#000000', True, True))
+                    self.window.draw_rectangle(context, True,x,y,11,11)
+                    setColor = True
+            except KeyError: # no key for this index
+                pass
+            
+            try:
                 color = self.colorIndex[i]
                 context.set_foreground(self.colors[color])
                 setColor = True
@@ -212,17 +269,12 @@ class MultiSquare(gtk.DrawingArea):
                     setColor = False
                 else:
                     pass
-
-            self.window.draw_rectangle(context,
-                                       True,
-                                       x,
-                                       y,
-                                       10,
-                                       10)
+            self.window.draw_rectangle(context,True,x,y,10,10)
             x += 12
             if (x > width):
                 x = 0
                 y += 12
+        return False
 
 
 class PiecesTab(Tab):
@@ -244,6 +296,9 @@ class PiecesTab(Tab):
         self._child_widget.add(vp)
         self._child_widget.get_parent().show_all()
 
+        #keep track of the current selected torrent
+        self._current = -1
+
 
         self._tid_cache = ""
         self._nump_cache = 0
@@ -261,6 +316,10 @@ class PiecesTab(Tab):
         # Only use the first torrent in the list or return if None selected
         if len(selected) != 0:
             selected = selected[0]
+            if(selected != self._current):
+                #new torrent selected, clear the selected pieces
+                self._ms.resetSelected()
+                self._current = selected
         else:
             # No torrent is selected in the torrentview
             return

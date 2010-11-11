@@ -2,6 +2,7 @@
 # setup.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
+# Copyright (C) 2010 Jens Timmerman <jens.timmerman@gmail.com>
 #
 # Basic plugin template created by:
 # Copyright (C) 2008 Martijn Voncken <mvoncken@gmail.com>
@@ -42,8 +43,8 @@ from setuptools import setup
 __plugin_name__ = "Pieces"
 __author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
-__version__ = "0.1"
-__url__ = "http://eecs.berkeley.edu/~nickl/pieces"
+__version__ = "0.3"
+__url__ = "https://github.com/nicklan/Deluge-Pieces-Plugin"
 __license__ = "GPLv3"
 __description__ = "Add a tab showing the status of each piece of the selected torrent"
 __long_description__ = """
@@ -55,6 +56,9 @@ of each piece of the torrent.
 There are three states for each piece: 
 not downloaded, downloaded, or currently downloading.  
 These are indicated by color.
+
+You can easily set the priority of a piece or a set of pieces by selecting them,
+right-clicking and selecting the desired priority.
 """
 __pkg_data__ = {__plugin_name__.lower(): ["template/*", "data/*"]}
 
