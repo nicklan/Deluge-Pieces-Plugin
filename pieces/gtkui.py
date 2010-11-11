@@ -62,8 +62,15 @@ class MultiSquare(gtk.DrawingArea):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_RELEASE_MASK | gtk.gdk.BUTTON1_MOTION_MASK)
         colormap = self.get_colormap()
         self.colors = []
+        alpha_fg = colormap.alloc_color("#3EBDD6",True,True)
+        self.alpha_colors = []
         for color in colors:
-            self.colors.append(colormap.alloc_color(color, True, True))
+            cc = colormap.alloc_color(color, True, True)
+            self.colors.append(cc)
+            self.alpha_colors.append(self.alpha_blend(alpha_fg,cc,0.5))
+
+        self.bg_sel_color = self.alpha_blend(alpha_fg,self.style.bg[0],0.5)
+
         self.colorIndex = {}
         self.selected = {}
 
@@ -73,6 +80,23 @@ class MultiSquare(gtk.DrawingArea):
         self.connect("button-press-event",self.bpe)
         self.connect("button-release-event",self.bre)
         self.connect('motion-notify-event', self.mne)
+
+
+    def alpha_blend(self,fg, bg, alpha):
+        '''Alpha blend some colors.'''
+        fg_vals = []
+        bg_vals = []
+
+        am = (1 - alpha)
+
+        target_red = am * bg.red_float + (alpha * fg.red_float)
+        target_green = am * bg.green_float + (alpha * fg.green_float)
+        target_blue = am * bg.blue_float + (alpha * fg.blue_float)
+
+        return self.get_colormap().alloc_color(int(round(target_red * 65535)),
+                                               int(round(target_green * 65535)),
+                                               int(round(target_blue * 65535)),
+                                               True,True)
 
     def resetSelected(self):
         '''resets the selected squares'''
@@ -246,16 +270,6 @@ class MultiSquare(gtk.DrawingArea):
         
 	for i in range(0,self.numSquares):
             try:
-                #if this square is selected,visualize this
-                if self.selected[i]:
-                    #todo: this could probably be optimized
-                    context.set_foreground( self.get_colormap().alloc_color('#000000', True, True))
-                    self.window.draw_rectangle(context, True,x,y,11,11)
-                    setColor = True
-            except KeyError: # no key for this index
-                pass
-            
-            try:
                 color = self.colorIndex[i]
                 context.set_foreground(self.colors[color])
                 setColor = True
@@ -265,7 +279,24 @@ class MultiSquare(gtk.DrawingArea):
                     setColor = False
                 else:
                     pass
+
             self.window.draw_rectangle(context,True,x,y,10,10)
+
+            #if this square is selected,visualize this
+            try:
+                if self.selected[i]:
+                    context.set_foreground(self.bg_sel_color)
+                    self.window.draw_rectangle(context, True,x,y,12,12)
+                    try:
+                        color = self.colorIndex[i]
+                        context.set_foreground(self.alpha_colors[color])
+                    except KeyError: # no key for this index
+                        context.set_foreground(self.alpha_colors[0])
+                    setColor = True
+                    self.window.draw_rectangle(context, True,x,y,10,10)
+            except KeyError:
+                pass
+
             x += 12
             if (x > width):
                 x = 0
@@ -298,9 +329,6 @@ class PiecesTab(Tab):
 
         self._tid_cache = ""
         self._nump_cache = 0
-
-    def motion(self,widget,event):
-        print "MOTION"
 
     def setColors(self,colors):
         self._ms.setColors(colors)
