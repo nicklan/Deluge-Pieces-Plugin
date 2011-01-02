@@ -73,6 +73,7 @@ class MultiSquare(gtk.DrawingArea):
 
         self.colorIndex = {}
         self.selected = {}
+        self.last_selected = -1
 
         self.connect("expose_event", self.expose)
         self.set_property("has-tooltip",True)
@@ -101,14 +102,19 @@ class MultiSquare(gtk.DrawingArea):
     def resetSelected(self):
         '''resets the selected squares'''
         self.selected = {}
+        self.last_selected = -1
 
     def mne(self, widget, event):
         '''called on motion notify event'''
-        if (self.window == None):
+        if (self.window == None or event.x < 0 or event.y < 0):
             return
         if (self.button1_in):
             #set the draged over square selected
-            self.selected[self.getIndex(event.x, event.y)] = True
+            idx = self.getIndex(event.x, event.y)
+            if (idx >= self.numSquares):
+                return
+            self.selected[idx] = True
+            self.last_selected = idx
             self.queue_draw()
         return True
 
@@ -148,11 +154,18 @@ class MultiSquare(gtk.DrawingArea):
         #clear the current selection and set this square as selected
         if(event.button == 1):
             self.button1_in = True
-            for i in range(0,self.numSquares):
-                self.selected[i]=False
             index = self.getIndex(event.x, event.y)
-            if index < self.numSquares:
-                self.selected[index] = True
+            if ((event.state & gtk.gdk.SHIFT_MASK) and (self.last_selected != -1)):
+                index += 1
+                end = min(index,self.numSquares)
+                for i in range(self.last_selected,end):
+                    self.selected[i] = True
+            else:
+                if not(event.state & gtk.gdk.CONTROL_MASK):
+                    self.resetSelected()
+                if index < self.numSquares:
+                    self.selected[index] = True
+                    self.last_selected = index
             self.queue_draw()
         return False
 
