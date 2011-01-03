@@ -267,6 +267,10 @@ class MultiSquare(gtk.DrawingArea):
         self.draw(self.context)
         
         return False
+
+    def clear(self):
+        self.numSquares = 0
+        self.queue_draw()
     
     def draw(self, context):
         rect = self.get_allocation()
@@ -345,6 +349,9 @@ class PiecesTab(Tab):
 
     def setColors(self,colors):
         self._ms.setColors(colors)
+
+    def clear(self):
+        self._ms.clear()
 
     def update(self):
         # Get the first selected torrent
