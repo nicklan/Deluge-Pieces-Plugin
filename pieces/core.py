@@ -43,6 +43,10 @@ import deluge.component as component
 import deluge.configmanager
 from deluge.core.rpcserver import export
 
+from twisted.internet.task import LoopingCall, deferLater
+from twisted.internet import reactor
+from priority_thread import priority_loop
+
 DEFAULT_PREFS = {
     "not_dled_color":"#000000",
     "dled_color":"#FF0000",
@@ -55,12 +59,44 @@ class Core(CorePluginBase):
         self.not_dled_color = self.config['not_dled_color']
         self.dled_color = self.config['dled_color']
         self.dling_color = self.config['dling_color']
+        self.priority_loop = None
+        self.priority_torrents = {}
+        deferLater(reactor, 5, self.enable_priority_loop)
+
+    def enable_priority_loop(self):
+        self.priority_loop = LoopingCall(priority_loop)
+        self.priority_loop.start(2)
 
     def disable(self):
-        pass
+        if self.priority_loop:
+            self.priority_loop.stop()
 
     def update(self):
         pass
+
+    @export
+    def add_priority_torrent(self, torr):
+        "add a torrent to have first un-downloaded piece priority boosted"
+        self.priority_torrents[torr] = True
+
+    @export
+    def del_priority_torrent(self, torr):
+        "stop a torrent trom having its first un-downloaded piece priority boosted"
+        if self.priority_torrents.get(torr):
+            del self.priority_torrents[torr]
+
+    @export
+    def is_priority_torrent(self, torr):
+        "return True if torrent is in list of torrents to prioritize first un-downloaded piece, else False"
+        if self.priority_torrents.get(torr):
+            return True
+        else:
+            return False
+
+    @export
+    def get_priority_torrents(self):
+        "get dict of torrents with first un-downloaded piece priority boosted"
+        return self.priority_torrents
 
     @export
     def set_config(self, config):

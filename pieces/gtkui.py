@@ -126,7 +126,7 @@ class MultiSquare(gtk.DrawingArea):
         sq = self.getIndex(x,y)
         if (sq >= self.numSquares):
             return False
-        pri = self._handle.piece_priority(sq)        
+        pri = self._handle.piece_priority(sq)   
         pris = {
             0: lambda : "Do Not Download",
             1: lambda : "Normal",
@@ -331,12 +331,17 @@ class PiecesTab(Tab):
         self._tab_label = glade_tab.get_widget("pieces_tab_label")
 
         self._ms = MultiSquare(0,['#000000','#FF0000','#0000FF'],glade_tab.get_widget("priority_menu"))
+
+        vb = gtk.VBox()
+        vb.add(self._ms)
+        self.cb = gtk.CheckButton(label="Set priority of first un-downloaded piece to High")
+        self.cb.connect("toggled",self.onPrioTogg)
+        vb.pack_end(self.cb,expand=False,fill=False,padding=5)
+
         vp = gtk.Viewport()
         vp.set_shadow_type(gtk.SHADOW_NONE)
-        #self._child_widget.connect("motion-notify-event",self.motion)
-        #self._child_widget.set_events(vp.get_events() |
-        #                              gtk.gdk.MOTION_NOTIFY)
-        vp.add(self._ms)
+        vp.add(vb)
+
         self._child_widget.add(vp)
         self._child_widget.get_parent().show_all()
 
@@ -347,11 +352,22 @@ class PiecesTab(Tab):
         self._tid_cache = ""
         self._nump_cache = 0
 
+    def onPrioTogg(self,widget):
+        if (self._current):
+            if (widget.get_active()):
+                client.pieces.add_priority_torrent(self._current)
+            else:
+                client.pieces.del_priority_torrent(self._current)
+        else:
+            widget.set_active(False)
+
+
     def setColors(self,colors):
         self._ms.setColors(colors)
 
     def clear(self):
         self._ms.clear()
+        self._current = None
 
     def update(self):
         # Get the first selected torrent
@@ -361,9 +377,10 @@ class PiecesTab(Tab):
         if len(selected) != 0:
             selected = selected[0]
             if(selected != self._current):
-                #new torrent selected, clear the selected pieces
+                #new torrent selected, clear the selected pieces, update priority checkbox
                 self._ms.resetSelected()
                 self._current = selected
+                client.pieces.is_priority_torrent(self._current).addCallback(self.cb.set_active)
         else:
             # No torrent is selected in the torrentview
             return
@@ -414,8 +431,6 @@ class PiecesTab(Tab):
                     cdli = -1
             else:
                 self._ms.setSquareColor(i,0)
-        #
-
 
 
 class GtkUI(GtkPluginBase):
