@@ -39,7 +39,7 @@
 from deluge.ui.client import client
 import deluge.component as component
 
-__target_priority = 7
+__target_priority = 5
 __last_first = {}
 
 def __priority_callback(torrents):
