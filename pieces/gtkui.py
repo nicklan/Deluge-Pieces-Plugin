@@ -356,15 +356,29 @@ class PiecesTab(Tab):
         #keep track of the current selected torrent
         self._current = -1
 
+        self._showed_prio_warn = False
+
 
     def onPrioTogg(self,widget):
         if (self._current):
             if (widget.get_active()):
+                if not(self._showed_prio_warn):
+                    self._showPrioWarn()
                 client.pieces.add_priority_torrent(self._current)
             else:
                 client.pieces.del_priority_torrent(self._current)
         else:
             widget.set_active(False)
+
+    def _showPrioWarn(self):
+        md = gtk.MessageDialog(component.get("MainWindow").main_glade.get_widget("main_window"),
+                               gtk.DIALOG_MODAL,
+                               gtk.MESSAGE_WARNING,
+                               gtk.BUTTONS_OK,
+                               "Using this option is rather unsocial and not particularly good for the torrent protocol.\n\nPlease use with care, and seed the torrent afterwards if you use this.")
+        md.run()
+        md.destroy()
+        self._showed_prio_warn = True
 
 
     def setColors(self,colors):
