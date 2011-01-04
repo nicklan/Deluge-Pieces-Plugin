@@ -277,15 +277,23 @@ class MultiSquare(gtk.DrawingArea):
         plen = self.numSquares
 
         width =  rect.width
+        numAcross = width / 12 
         height = ((plen / (width / 12)) + 1)*12
         width -= 12
         self.set_size_request(width,height)
 
-        x = y = 0
         setColor = False
         context.set_foreground(self.colors[0])
-        
-	for i in range(0,self.numSquares):
+
+        visrect = self.window.get_visible_region().get_clipbox()
+        first = (visrect.y/12)*numAcross
+        last = first + (visrect.height/12 + 2)*numAcross
+        last = min(last,self.numSquares)
+
+        x = 0
+        y = visrect.y - (visrect.y%12)
+
+	for i in range(first,last):
             try:
                 color = self.colorIndex[i]
                 context.set_foreground(self.colors[color])
@@ -397,7 +405,6 @@ class PiecesTab(Tab):
         self._ms.setTorrentHandle(tor.handle)
 
         plen = len(stat.pieces)
-        self._ms.setNumSquares(plen)
         if (plen <= 0):
             if (stat.num_pieces == 0):
                 return
@@ -408,6 +415,7 @@ class PiecesTab(Tab):
                     self._ms.setSquareColor(i,1)
                 return
 
+        self._ms.setNumSquares(plen)
         peers = tor.handle.get_peer_info()
         curdl = []
         for peer in peers:
