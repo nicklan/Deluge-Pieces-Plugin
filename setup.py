@@ -43,22 +43,40 @@ from setuptools import setup
 __plugin_name__ = "Pieces"
 __author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
-__version__ = "0.3"
+__version__ = "0.4"
 __url__ = "https://github.com/nicklan/Deluge-Pieces-Plugin"
 __license__ = "GPLv3"
 __description__ = "Add a tab showing the status of each piece of the selected torrent"
 __long_description__ = """
 Pieces Plugin
 
-Adds a tab that will show the status 
-of each piece of the torrent. 
+(c)2010 by Nick Lanham <nick@afternight.org>
+
+This plugin adds a tab that will show the status of each piece of the
+torrent.
 
 There are three states for each piece: 
 not downloaded, downloaded, or currently downloading.  
 These are indicated by color.
 
 You can easily set the priority of a piece or a set of pieces by selecting them,
-right-clicking and selecting the desired priority.
+right-click and set the priority.
+
+You can select multiple pieces in a few ways.
+ - Click the first piece you want to select.  Hold Shift and click the
+   last piece you want to select.  All pieces in between will be
+	 selected.
+ - Clicking and dragging over the pieces you want to select
+ - Holding Ctrl will start selecting pieces without unselecting the
+   ones you have already selected
+
+
+Underneath all the pieces is a checkbox that will allow you to always
+prioritize the first un-downloaded piece of the torrent. This lets you
+start watching a movie while it is still downloading. After completing
+the torrent you should continue to seed for a while, because this
+behaviour is actually not sociable and bad for the torrent
+protocol. Please use with care. 
 """
 __pkg_data__ = {__plugin_name__.lower(): ["template/*", "data/*"]}
 
