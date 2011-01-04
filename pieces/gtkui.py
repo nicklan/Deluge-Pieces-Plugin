@@ -357,9 +357,6 @@ class PiecesTab(Tab):
         self._current = -1
 
 
-        self._tid_cache = ""
-        self._nump_cache = 0
-
     def onPrioTogg(self,widget):
         if (self._current):
             if (widget.get_active()):
@@ -396,12 +393,6 @@ class PiecesTab(Tab):
         tor = component.get("TorrentManager").torrents[selected]
         stat = tor.status
 
-        #if (self._tid_cache == selected and
-        #    self._nump_cache ==  stat.num_pieces):
-        #    return
-
-        self._tid_cache = selected
-        self._nump_cache = stat.num_pieces
         self._ms.setTorrentHandle(tor.handle)
 
         plen = len(stat.pieces)
