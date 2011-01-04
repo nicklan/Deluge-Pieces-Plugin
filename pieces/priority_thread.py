@@ -1,7 +1,7 @@
 #
 # priority_thread.py
 #
-# Copyright (C) 2009 Nick Lanham <nick@afternight.org>
+# Copyright (C) 2010 Nick Lanham <nick@afternight.org>
 #
 # Basic plugin template created by:
 # Copyright (C) 2008 Martijn Voncken <mvoncken@gmail.com>
@@ -66,7 +66,6 @@ def __priority_callback(torrents):
                 continue
             # lf is now the first un-downloaded, desired piece of this torrent
             if (tor.handle.piece_priority(lf) < __target_priority):
-                print "bumping",lf,"for",t
                 tor.handle.piece_priority(lf,__target_priority)
             __last_first[t] = lf
                 
