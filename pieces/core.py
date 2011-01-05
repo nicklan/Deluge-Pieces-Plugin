@@ -68,7 +68,7 @@ class Core(CorePluginBase):
         self.priority_loop.start(2)
 
     def disable(self):
-        if self.priority_loop:
+        if self.priority_loop and self.priority_loop.running:
             self.priority_loop.stop()
 
     def update(self):
