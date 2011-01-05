@@ -44,7 +44,6 @@ __last_first = {}
 
 def priority_loop(meth):
     torrents = meth()
-    print "here",torrents
     for t in torrents:
         tor = component.get("TorrentManager").torrents[t]
         if tor.status.state == tor.status.downloading:
