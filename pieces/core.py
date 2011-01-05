@@ -64,7 +64,7 @@ class Core(CorePluginBase):
         deferLater(reactor, 5, self.enable_priority_loop)
 
     def enable_priority_loop(self):
-        self.priority_loop = LoopingCall(priority_loop)
+        self.priority_loop = LoopingCall(priority_loop,self.get_priority_torrents)
         self.priority_loop.start(2)
 
     def disable(self):

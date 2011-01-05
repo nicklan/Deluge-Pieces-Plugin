@@ -42,7 +42,9 @@ import deluge.component as component
 __target_priority = 5
 __last_first = {}
 
-def __priority_callback(torrents):
+def priority_loop(meth):
+    torrents = meth()
+    print "here",torrents
     for t in torrents:
         tor = component.get("TorrentManager").torrents[t]
         if tor.status.state == tor.status.downloading:
@@ -68,7 +70,3 @@ def __priority_callback(torrents):
             if (tor.handle.piece_priority(lf) < __target_priority):
                 tor.handle.piece_priority(lf,__target_priority)
             __last_first[t] = lf
-                
-
-def priority_loop():
-    client.pieces.get_priority_torrents().addCallback(__priority_callback)
