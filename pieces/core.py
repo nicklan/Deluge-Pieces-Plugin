@@ -74,6 +74,40 @@ class Core(CorePluginBase):
     def update(self):
         pass
 
+    @export 
+    def get_torrent_info(self, tid):
+        tor = component.get("TorrentManager").torrents[tid]
+        self.__handle_cache = tor.handle
+        stat = tor.status
+
+        plen = len(stat.pieces)
+        if (plen <= 0):
+            if (stat.num_pieces == 0):
+                return (True, 0, None, None)
+            if (stat.state == stat.seeding or stat.state == stat.finished):
+                return (True, stat.num_pieces, None, None)
+
+        peers = tor.handle.get_peer_info()
+        curdl = []
+        for peer in peers:
+            if peer.downloading_piece_index != -1:
+                curdl.append(peer.downloading_piece_index)
+
+        curdl = dict.fromkeys(curdl).keys() 
+        curdl.sort()
+
+        return (False, plen, stat.pieces, curdl)
+
+    @export
+    def get_piece_priority(self, pid):
+        return pid,self.__handle_cache.piece_priority(pid)
+
+    @export
+    def piece_priorities(self, selected, priority):
+        for i in selected:
+            if selected[i]: 
+                self.__handle_cache.piece_priority(i,priority)
+
     @export
     def add_priority_torrent(self, torr):
         "add a torrent to have first un-downloaded piece priority boosted"

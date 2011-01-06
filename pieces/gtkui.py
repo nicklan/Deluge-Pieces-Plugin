@@ -1,4 +1,3 @@
-#
 # gtkui.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
@@ -47,13 +46,16 @@ import deluge.component as component
 import deluge.common
 from deluge.ui.gtkui.torrentdetails import Tab
 
+from twisted.internet import reactor
+
 from common import get_resource
 
 class MultiSquare(gtk.DrawingArea):
-    def __init__(self, numSquares=0, colors=['#000000'],menu=None):
+    def __init__(self, numSquares=0, colors=['#000000'],display=None,menu=None):
         gtk.DrawingArea.__init__(self)
         self.numSquares = numSquares
         self.menu = menu
+        self.display = display
         self.button1_in = False
 
         for item in menu.get_children():
@@ -74,6 +76,7 @@ class MultiSquare(gtk.DrawingArea):
         self.colorIndex = {}
         self.selected = {}
         self.last_selected = -1
+        self.__sq = -1
 
         self.connect("expose_event", self.expose)
         self.set_property("has-tooltip",True)
@@ -118,15 +121,7 @@ class MultiSquare(gtk.DrawingArea):
             self.queue_draw()
         return True
 
-
-    def qtt(self,widget, x, y, keyboard_mode, tooltip):
-        '''called on query tooltip'''
-        if (self.window == None):
-            return
-        sq = self.getIndex(x,y)
-        if (sq >= self.numSquares):
-            return False
-        pri = self._handle.piece_priority(sq)   
+    def __qtt_callback(self, (sq,pri)):
         pris = {
             0: lambda : "Do Not Download",
             1: lambda : "Normal",
@@ -134,7 +129,22 @@ class MultiSquare(gtk.DrawingArea):
             5: lambda : "Higher",
             7: lambda : "Highest"
             }[pri]()
-        tooltip.set_text("Piece: %i (%s)" % (sq,pris))
+        self.__sq = sq
+        self.__tooltip_text = "Piece: %i (%s)" % (sq, pris)
+        gtk.tooltip_trigger_tooltip_query(self.display)
+
+    def qtt(self, widget, x, y, keyboard_mode, tooltip):
+        '''called on query tooltip'''
+        if (self.window == None):
+            return
+        sq = self.getIndex(x,y)
+        if (sq >= self.numSquares):
+            return False
+
+        if (sq != self.__sq):
+            self.__tooltip_text = "Piece: %i (%s)" % (sq,"Loading...")
+            client.pieces.get_piece_priority(sq).addCallback(self.__qtt_callback)
+        tooltip.set_text(self.__tooltip_text)
         return True
 
     def bpe(self, widget, event):
@@ -202,9 +212,7 @@ class MultiSquare(gtk.DrawingArea):
             priority = 0
 
         #update every selected piece
-        for i in self.selected:
-            if self.selected[i]: # if actually selected
-                self._handle.piece_priority(i,priority)
+        client.pieces.piece_priorities(self.selected,priority)
         return False
 
     def setSquareColor(self,square,color):
@@ -245,9 +253,6 @@ class MultiSquare(gtk.DrawingArea):
         if (self.numSquares != numSquares):
             self.numSquares = numSquares
             self.queue_draw()
-
-    def setTorrentHandle(self,handle):
-        self._handle = handle
 
     def setColors(self,colors):
         colormap = self.get_colormap()
@@ -338,7 +343,9 @@ class PiecesTab(Tab):
         self._child_widget = glade_tab.get_widget("pieces_tab")
         self._tab_label = glade_tab.get_widget("pieces_tab_label")
 
-        self._ms = MultiSquare(0,['#000000','#FF0000','#0000FF'],glade_tab.get_widget("priority_menu"))
+        self._ms = MultiSquare(0,['#000000','#FF0000','#0000FF'],
+                               display=self._child_widget.get_display(),
+                               menu=glade_tab.get_widget("priority_menu"))
 
         vb = gtk.VBox()
         vb.add(self._ms)
@@ -349,6 +356,7 @@ class PiecesTab(Tab):
         vp = gtk.Viewport()
         vp.set_shadow_type(gtk.SHADOW_NONE)
         vp.add(vb)
+
 
         self._child_widget.add(vp)
         self._child_widget.get_parent().show_all()
@@ -363,12 +371,16 @@ class PiecesTab(Tab):
         if (self._current):
             if (widget.get_active()):
                 if not(self._showed_prio_warn):
-                    self._showPrioWarn()
+                    reactor.callLater(0,self._showPrioWarn)
+                    self._showed_prio_warn = True
                 client.pieces.add_priority_torrent(self._current)
             else:
                 client.pieces.del_priority_torrent(self._current)
         else:
             widget.set_active(False)
+
+    def __dest(self, widget, response):
+        widget.destroy()
 
     def _showPrioWarn(self):
         md = gtk.MessageDialog(component.get("MainWindow").main_glade.get_widget("main_window"),
@@ -376,9 +388,9 @@ class PiecesTab(Tab):
                                gtk.MESSAGE_WARNING,
                                gtk.BUTTONS_OK,
                                "Using this option is rather unsocial and not particularly good for the torrent protocol.\n\nPlease use with care, and seed the torrent afterwards if you use this.")
-        md.run()
-        md.destroy()
-        self._showed_prio_warn = True
+        md.connect('response', self.__dest)
+        md.show_all()
+        return False
 
 
     def setColors(self,colors):
@@ -387,6 +399,34 @@ class PiecesTab(Tab):
     def clear(self):
         self._ms.clear()
         self._current = None
+
+    def __update_callback(self, (is_fin, num_pieces, pieces, curdl)):
+        if (num_pieces == 0):
+            return
+        if (is_fin):
+            self._ms.setNumSquares(num_pieces)
+            for i in range (0,num_pieces):
+                self._ms.setSquareColor(i,1)
+            return
+
+        self._ms.setNumSquares(num_pieces)
+
+        cdll = len(curdl)
+        cdli = 0
+        if (cdll == 0):
+            cdli = -1
+
+	for i,p in enumerate(pieces):
+            if p:
+                self._ms.setSquareColor(i,1)
+            elif (cdli != -1 and i == curdl[cdli]):
+                self._ms.setSquareColor(i,2)
+                cdli += 1
+                if cdli >= cdll:
+                    cdli = -1
+            else:
+                self._ms.setSquareColor(i,0)
+
 
     def update(self):
         # Get the first selected torrent
@@ -404,46 +444,7 @@ class PiecesTab(Tab):
             # No torrent is selected in the torrentview
             return
 
-        tor = component.get("TorrentManager").torrents[selected]
-        stat = tor.status
-
-        self._ms.setTorrentHandle(tor.handle)
-
-        plen = len(stat.pieces)
-        if (plen <= 0):
-            if (stat.num_pieces == 0):
-                return
-            if (stat.state == stat.seeding or
-                stat.state == stat.finished):
-                self._ms.setNumSquares(stat.num_pieces)
-                for i in range (0,stat.num_pieces):
-                    self._ms.setSquareColor(i,1)
-                return
-
-        self._ms.setNumSquares(plen)
-        peers = tor.handle.get_peer_info()
-        curdl = []
-        for peer in peers:
-            if peer.downloading_piece_index != -1:
-                curdl.append(peer.downloading_piece_index)
-
-        curdl = dict.fromkeys(curdl).keys() 
-        curdl.sort()
-        cdll = len(curdl)
-        cdli = 0
-        if (cdll == 0):
-            cdli = -1
-
-	for i,p in enumerate(stat.pieces):
-            if p:
-                self._ms.setSquareColor(i,1)
-            elif (cdli != -1 and i == curdl[cdli]):
-                self._ms.setSquareColor(i,2)
-                cdli += 1
-                if cdli >= cdll:
-                    cdli = -1
-            else:
-                self._ms.setSquareColor(i,0)
+        client.pieces.get_torrent_info(selected).addCallback(self.__update_callback)
 
 
 class GtkUI(GtkPluginBase):
