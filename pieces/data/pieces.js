@@ -31,20 +31,144 @@ Copyright:
     statement from all source files in the program, then also delete it here.
 */
 
-PiecesPlugin = Ext.extend(Deluge.Plugin, {
-	constructor: function(config) {
-		config = Ext.apply({
-			name: "Pieces"
-		}, config);
-		PiecesPlugin.superclass.constructor.call(this, config);
-	},
-	
-	onDisable: function() {
+Ext.namespace('Deluge.pieces');
+var dh = Ext.DomHelper;
+
+Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
+		title: _('Pieces'),
+
+		constructor: function() {
+			Deluge.pieces.PiecesTab.superclass.constructor.call(this);
+			this.updateConfig();
+			this.tdtpl = new Ext.Template('<td id="ptd{0}" title="Piece {0}" style="background-color:{1};" width="8" height="10"></td>');
+			this.tdtpl.compile();
+			this.trtpl = new Ext.Template('<tr id="{id}"></tr>');
+			this.trtpl.compile();
+			this.curTorrent = null;
+			this.lastDone = false;
+			this.tableBox = this.add({
+					xtype: 'box',
+					autoEl: {
+						tag: 'table',
+						id: 'pieces_table',
+						style: 'table-layout: fixed',
+						cellspacing: 2
+					}
+				});
+			this.needRebuild = true;
+		},
 		
-	},
-	
-	onEnable: function() {
+		updateConfig: function() {
+			deluge.client.pieces.get_config({
+					success: function(config) {
+						var ctmp = config['dling_color'].split("");
+						this.dlingColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
+						ctmp = config['dled_color'].split("");
+						this.dledColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
+						ctmp = config['not_dled_color'].split("");
+						this.notDledColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
+					},
+					scope: this
+				});
+		},
+
+
+		buildTable: function(numPieces, done, pieces, curdl) {
+			var w = this.getWidth();
+			var nc = Math.ceil(w/12);
+			var nr = Math.ceil(numPieces/nc);
+			var pid = 0;
+			var cdi = 0;
+			if (done || cdi >= curdl.length)
+				cdi = -1;
+			this.clear();
+			for (i = 0;i < nr;i++) {
+				var rid = "pr"+i;
+				this.trtpl.append('pieces_table',{id:rid});
+				for (j = 0;j < nc;j++) {
+					if (cdi != -1 && curdl[cdi] == pid) {
+						cdi++;
+						if (cdi >= curdl.length)
+							cdi = -1;
+						this.tdtpl.append(rid,[pid,this.dlingColor]);
+					}
+					else if (done)
+						this.tdtpl.append(rid,[pid,this.dledColor]);
+					else
+						this.tdtpl.append(rid,[pid,pieces[pid]?this.dledColor:this.notDledColor]);
+
+					pid++;
+					if (pid >= numPieces)
+						break;
+				}
+				if (pid >= numPieces)
+					break;
+			}
+		},
+
+		updateTable: function(numPieces, done, pieces, curdl) {
+			var cdi = 0;
+			if (done || cdi >= curdl.length)
+				cdi = -1;
+			for (pid = 0;pid < numPieces;pid++) {
+				var td = Ext.DomQuery.selectNode("td[id=ptd"+pid+"]");
+				if (cdi != -1 && curdl[cdi] == pid) {
+					cdi++;
+					if (cdi >= curdl.length)
+						cdi = -1;
+					td.style.backgroundColor = this.dlingColor;
+				}
+				else if (pieces[pid])
+					td.style.backgroundColor = this.dledColor;
+				else
+					td.style.backgroundColor = this.notDledColor;
+			}
+		},
+
+		onTorrentInfo: function(info) {
+			if (this.needRebuild) {
+				this.buildTable(info[1],info[0],info[2],info[3]);
+				this.needRebuild = false;
+				this.lastDone = info[0];
+			} else {
+				if (!this.lastDone)
+					this.updateTable(info[1],info[0],info[2],info[3]);
+				this.lastDone = info[0];
+			}
+		},
+
+		clear: function() {
+			if (!this.tblnode)
+				this.tblnode = Ext.DomQuery.selectNode("table[id=pieces_table]");
+			if (this.tblnode)
+				this.tblnode.innerHTML = "";
+			this.needRebuild = true;
+		},
+
+		update: function(torrentId) {
+			if (torrentId != this.curTorrent) {
+				this.needRebuild = true;
+				this.curTorrent = torrentId;
+			}
+			deluge.client.pieces.get_torrent_info(torrentId, {
+					success: this.onTorrentInfo,
+					scope: this,
+					torrentId: torrentId
+				});
+		}
 		
-	}
 });
-new PiecesPlugin();
+
+Deluge.pieces.PiecesPlugin = Ext.extend(Deluge.Plugin, {
+		name:"Pieces",
+
+		onDisable: function() {
+
+		},
+
+		onEnable: function() {
+			deluge.details.add(new Deluge.pieces.PiecesTab());
+		}
+
+});
+Deluge.registerPlugin('Pieces',Deluge.pieces.PiecesPlugin);
