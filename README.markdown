@@ -25,10 +25,10 @@ If you are using the gtkui you can easily set the priority of a piece
 or a set of pieces by selecting them, right-click and set the
 priority.
 
-You can select multiple pieces in a few ways.
-* Click the first piece you want to select.  Hold Shift and click the last piece you want to select.  All pieces in between will be selected.
-* Clicking and dragging over the pieces you want to select
-* Holding Ctrl will start selecting pieces without unselecting the ones you have already selected
+You can select multiple pieces in a few ways.  
+* Click the first piece you want to select.  Hold Shift and click the last piece you want to select.  All pieces in between will be selected.  
+* Clicking and dragging over the pieces you want to select  
+* Holding Ctrl will start selecting pieces without unselecting the ones you have already selected  
 
 
 Underneath all the pieces is a checkbox that will allow you to always
