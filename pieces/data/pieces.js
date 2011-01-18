@@ -3,7 +3,7 @@ Script: pieces.js
     The client-side javascript code for the Pieces plugin.
 
 Copyright:
-    (C) Nick Lanham 2009 <damoxc@gmail.com>
+    (C) Nick Lanham 2009 <nick@afternight.org>
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3, or (at your option)
