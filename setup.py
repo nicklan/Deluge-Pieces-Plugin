@@ -43,7 +43,7 @@ from setuptools import setup
 __plugin_name__ = "Pieces"
 __author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
-__version__ = "0.4"
+__version__ = "0.5"
 __url__ = "https://github.com/nicklan/Deluge-Pieces-Plugin"
 __license__ = "GPLv3"
 __description__ = "Add a tab showing the status of each piece of the selected torrent"
