@@ -2,7 +2,6 @@
 https://github.com/nicklan/Deluge-Pieces-Plugin
 
 (c)2010 by Nick Lanham <nick@afternight.org>
-
 Thanks to Jens Timmerman <jens.timmerman@gmail.com> for some of the
 code to select multiple pieces
 
@@ -11,8 +10,8 @@ code to select multiple pieces
 This plugin adds a tab that will show the status of each piece of the
 torrent.
 
-There are three states for each piece:  
-not downloaded, downloaded, or currently downloading.    
+There are three states for each piece: 
+not downloaded, downloaded, or currently downloading. 
 These are indicated by color.
 
 The plugin works in "Classic" mode, client/server mode, and with the
@@ -25,7 +24,8 @@ If you are using the gtkui you can easily set the priority of a piece
 or a set of pieces by selecting them, right-click and set the
 priority.
 
-You can select multiple pieces in a few ways.  
+You can select multiple pieces in a few ways:  
+
 * Click the first piece you want to select.  Hold Shift and click the last piece you want to select.  All pieces in between will be selected.  
 * Clicking and dragging over the pieces you want to select  
 * Holding Ctrl will start selecting pieces without unselecting the ones you have already selected  
