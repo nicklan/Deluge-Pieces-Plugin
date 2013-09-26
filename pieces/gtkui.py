@@ -124,10 +124,13 @@ class MultiSquare(gtk.DrawingArea):
     def __qtt_callback(self, (sq,pri)):
         pris = {
             0: lambda : "Do Not Download",
-            1: lambda : "Normal",
-            2: lambda : "High",
-            5: lambda : "Higher",
-            7: lambda : "Highest"
+            1: lambda : "Normal (1)",
+            2: lambda : "High (2)",
+            3: lambda : "High (3)",
+            4: lambda : "High (4)",
+            5: lambda : "Higher (5)",
+            6: lambda : "Higher (6)",
+            7: lambda : "Highest (7)"
             }[pri]()
         self.__sq = sq
         self.__tooltip_text = "Piece: %i (%s)" % (sq, pris)
