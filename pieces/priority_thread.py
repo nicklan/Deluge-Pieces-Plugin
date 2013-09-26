@@ -66,6 +66,19 @@ def priority_loop(meth):
             except ValueError:
                 continue
             # lf is now the first un-downloaded, desired piece of this torrent
-            if (tor.handle.piece_priority(lf) < __target_priority):
-                tor.handle.piece_priority(lf,__target_priority)
+            if (tor.handle.piece_priority(lf) <= __target_priority):
+                print lf
+                lenth = len(tor.status.pieces)
+                pt = __target_priority
+                i = lf-1
+                while pt > 1:
+                    i = i+1
+
+                    if tor.status.pieces[i] or (tor.handle.piece_priority(i) == 0):
+                        continue
+                    if (i) >= lenth-1:
+                        break
+
+                    tor.handle.piece_priority(i, pt)
+                    pt=pt-1
             __last_first[t] = lf
