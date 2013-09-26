@@ -111,6 +111,13 @@ class Core(CorePluginBase):
     @export
     def add_priority_torrent(self, torr):
         "add a torrent to have first un-downloaded piece priority boosted"
+        tor = component.get("TorrentManager").torrents[torr]
+        lenth = len(tor.status.pieces)
+        i=0
+        while i < lenth:
+            if not(tor.status.pieces[i]) and (tor.handle.piece_priority(i) != 0):
+                tor.handle.piece_priority(i, 1)
+            i=i+1
         self.priority_torrents[torr] = True
 
     @export
