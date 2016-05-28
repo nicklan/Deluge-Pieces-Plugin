@@ -11,7 +11,7 @@ This plugin adds a tab that will show the status of each piece of the
 torrent.
 
 There are three states for each piece: 
-not downloaded, downloaded, or currently downloading. 
+not downloaded (black), downloaded (red), or currently downloading (blue). 
 These are indicated by color.
 
 The plugin works in "Classic" mode, client/server mode, and with the
