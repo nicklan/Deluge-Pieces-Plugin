@@ -35,7 +35,7 @@ Ext.namespace('Deluge.pieces');
 var dh = Ext.DomHelper;
 
 Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
-		title: _('Pieces'),
+		title: _('Pieces lex'),
 
 		constructor: function() {
 			Deluge.pieces.PiecesTab.superclass.constructor.call(this);
@@ -160,7 +160,7 @@ Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
 });
 
 Deluge.pieces.PiecesPlugin = Ext.extend(Deluge.Plugin, {
-		name:"Pieces",
+		name:"Pieces lex",
 
 		onDisable: function() {
 
@@ -171,4 +171,4 @@ Deluge.pieces.PiecesPlugin = Ext.extend(Deluge.Plugin, {
 		}
 
 });
-Deluge.registerPlugin('Pieces',Deluge.pieces.PiecesPlugin);
+Deluge.registerPlugin('Pieces lex',Deluge.pieces.PiecesPlugin);

@@ -342,7 +342,7 @@ class PiecesTab(Tab):
         Tab.__init__(self)
         glade_tab = gtk.glade.XML(get_resource("pieces_tab.glade"))
 
-        self._name = "Pieces"
+        self._name = "Pieces_lex"
         self._child_widget = glade_tab.get_widget("pieces_tab")
         self._tab_label = glade_tab.get_widget("pieces_tab_label")
 
@@ -457,18 +457,18 @@ class GtkUI(GtkPluginBase):
         component.get("TorrentDetails").add_tab(self._pieces_tab)
         client.pieces.get_config().addCallback(self.set_colors)
 
-        component.get("Preferences").add_page("Pieces", self.glade_cfg.get_widget("prefs_box"))
+        component.get("Preferences").add_page("Pieces_lex", self.glade_cfg.get_widget("prefs_box"))
         component.get("PluginManager").register_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").register_hook("on_show_prefs", self.on_show_prefs)
 
     def disable(self):
-        component.get("Preferences").remove_page("Pieces")
-        component.get("TorrentDetails").remove_tab("Pieces")
+        component.get("Preferences").remove_page("Pieces_lex")
+        component.get("TorrentDetails").remove_tab("Pieces_lex")
         component.get("PluginManager").deregister_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").deregister_hook("on_show_prefs", self.on_show_prefs)
 
     def on_apply_prefs(self):
-        log.debug("applying prefs for Pieces")
+        log.debug("applying prefs for Pieces_lex")
         config = {
             "not_dled_color":self.glade_cfg.get_widget("not_dl_button").get_color().to_string(),
             "dled_color":self.glade_cfg.get_widget("dl_button").get_color().to_string(),
