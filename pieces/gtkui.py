@@ -342,7 +342,7 @@ class PiecesTab(Tab):
         Tab.__init__(self)
         glade_tab = gtk.glade.XML(get_resource("pieces_tab.glade"))
 
-        self._name = "Pieces_lex"
+        self._name = "Pieces"
         self._child_widget = glade_tab.get_widget("pieces_tab")
         self._tab_label = glade_tab.get_widget("pieces_tab_label")
 
@@ -352,7 +352,7 @@ class PiecesTab(Tab):
 
         vb = gtk.VBox()
         vb.add(self._ms)
-        self.cb = gtk.CheckButton(label="Set priority of first un-downloaded piece to High")
+        self.cb = gtk.CheckButton(label="Set priority of first few un-downloaded pieces to High")
         self.cb.connect("toggled",self.onPrioTogg)
         vb.pack_end(self.cb,expand=False,fill=False,padding=5)
 
@@ -390,7 +390,7 @@ class PiecesTab(Tab):
                                gtk.DIALOG_MODAL,
                                gtk.MESSAGE_WARNING,
                                gtk.BUTTONS_OK,
-                               "Using this option is rather unsocial and not particularly good for the torrent protocol.\n\nPlease use with care, and seed the torrent afterwards if you use this.")
+                               "Using this option for torrents with an unhealthy swarm is rather unsocial and not particularly good for the swarm.\n\nPlease use with care.")
         md.connect('response', self.__dest)
         md.show_all()
         return False
@@ -457,18 +457,18 @@ class GtkUI(GtkPluginBase):
         component.get("TorrentDetails").add_tab(self._pieces_tab)
         client.pieces.get_config().addCallback(self.set_colors)
 
-        component.get("Preferences").add_page("Pieces_lex", self.glade_cfg.get_widget("prefs_box"))
+        component.get("Preferences").add_page("Pieces", self.glade_cfg.get_widget("prefs_box"))
         component.get("PluginManager").register_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").register_hook("on_show_prefs", self.on_show_prefs)
 
     def disable(self):
-        component.get("Preferences").remove_page("Pieces_lex")
-        component.get("TorrentDetails").remove_tab("Pieces_lex")
+        component.get("Preferences").remove_page("Pieces")
+        component.get("TorrentDetails").remove_tab("Pieces")
         component.get("PluginManager").deregister_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").deregister_hook("on_show_prefs", self.on_show_prefs)
 
     def on_apply_prefs(self):
-        log.debug("applying prefs for Pieces_lex")
+        log.debug("applying prefs for Pieces")
         config = {
             "not_dled_color":self.glade_cfg.get_widget("not_dl_button").get_color().to_string(),
             "dled_color":self.glade_cfg.get_widget("dl_button").get_color().to_string(),

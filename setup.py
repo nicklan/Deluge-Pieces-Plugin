@@ -43,7 +43,7 @@ from setuptools import setup
 __plugin_name__ = "Pieces"
 __author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
-__version__ = "0.5"
+__version__ = "0.6"
 __url__ = "https://github.com/nicklan/Deluge-Pieces-Plugin"
 __license__ = "GPLv3"
 __description__ = "Add a tab showing the status of each piece of the selected torrent"
@@ -72,11 +72,8 @@ You can select multiple pieces in a few ways.
 
 
 Underneath all the pieces is a checkbox that will allow you to always
-prioritize the first un-downloaded piece of the torrent. This lets you
-start watching a movie while it is still downloading. After completing
-the torrent you should continue to seed for a while, because this
-behaviour is actually not sociable and bad for the torrent
-protocol. Please use with care. 
+prioritize the first un-downloaded pieces of the torrent. This lets you
+start watching a movie while it is still downloading. 
 """
 __pkg_data__ = {__plugin_name__.lower(): ["template/*", "data/*"]}
 
