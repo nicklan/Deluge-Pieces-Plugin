@@ -63,14 +63,12 @@ def priority_loop(meth):
 
                 #loop until we've marked the next undownloaded piece
                 while (tor.handle.have_piece(i_piece) == True): #downloaded by now
-                    #print "incrementing base"
                     i_piece += 1
 
                     #find number of pieces after i_piece that are marked for download
                     #i=index (starting at i_piece), p=priority
                     for (i,p) in enumerate(prios[i_piece:]):
                         if p > 0:
-                            #print "found next base at: ", i
                             i_piece = i + i_piece
                             break
 
@@ -79,7 +77,6 @@ def priority_loop(meth):
                 #loop again and mark __n_extra pieces for higher priority
                 for (i,p) in enumerate(prios[i_piece:]):
                     if n >= __n_extra:
-                        #print "n is done"
                         break
 
                     if p > 0: #marked for download
@@ -87,13 +84,11 @@ def priority_loop(meth):
 
                         if (tor.handle.have_piece(j_piece) == False): #not downloaded yet
                             n += 1
-                            #print "found one, n at: ", n
 
                             if (tor.handle.piece_priority(j_piece) < __target_priority):
                                 tor.handle.piece_priority(j_piece, __target_priority)
 
                 __last_first[t] = i_piece
-                #print "sequence done \n"
 
             except ValueError:
                 continue
