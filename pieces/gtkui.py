@@ -352,7 +352,7 @@ class PiecesTab(Tab):
 
         vb = gtk.VBox()
         vb.add(self._ms)
-        self.cb = gtk.CheckButton(label="Set priority of first un-downloaded piece to High")
+        self.cb = gtk.CheckButton(label="Set priority of first few un-downloaded pieces to High")
         self.cb.connect("toggled",self.onPrioTogg)
         vb.pack_end(self.cb,expand=False,fill=False,padding=5)
 
@@ -390,7 +390,7 @@ class PiecesTab(Tab):
                                gtk.DIALOG_MODAL,
                                gtk.MESSAGE_WARNING,
                                gtk.BUTTONS_OK,
-                               "Using this option is rather unsocial and not particularly good for the torrent protocol.\n\nPlease use with care, and seed the torrent afterwards if you use this.")
+                               "Using this option for torrents with an unhealthy swarm is rather unsocial and not particularly good for the swarm.\n\nPlease use with care.")
         md.connect('response', self.__dest)
         md.show_all()
         return False

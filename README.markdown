@@ -4,6 +4,8 @@ https://github.com/nicklan/Deluge-Pieces-Plugin
 (c)2010 by Nick Lanham <nick@afternight.org>
 Thanks to Jens Timmerman <jens.timmerman@gmail.com> for some of the
 code to select multiple pieces
+Thanks to Lex Leonard <lexman098@gmail.com> for some of the
+code to enhance streaming of pieces
 
 ## Description
 
@@ -32,17 +34,17 @@ You can select multiple pieces in a few ways:
 
 
 Underneath all the pieces is a checkbox that will allow you to always
-prioritize the first un-downloaded piece of the torrent. This lets you
-start watching a movie while it is still downloading. After completing
-the torrent you should continue to seed for a while, because this
-behaviour is actually not sociable and bad for the torrent
-protocol. Please use with care. 
+prioritize the first un-downloaded pieces of the torrent. This lets you
+start watching a movie while it is still downloading. 
 
 
 To install this plugin in deluge: go to edit, preferences, plugins,
 install plugin and select the .egg file.
 
 # Version Info
+
+## Version 0.6
+* Added streaming of more than 1 piece (set to 15)
 
 ## Version 0.5
 * Plugin works in client/server and "Classic" mode

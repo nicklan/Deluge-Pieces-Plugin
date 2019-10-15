@@ -41,31 +41,54 @@ import deluge.component as component
 
 __target_priority = 5
 __last_first = {}
+__n_extra = 15
 
 def priority_loop(meth):
     torrents = meth()
-    for t in torrents:
+
+    for t in torrents: #go through all torrents
         tor = component.get("TorrentManager").torrents[t]
+
         if tor.status.state == tor.status.downloading:
+            #get first piece corresponding to this torrent
+            #stored from last looping call
             lf = __last_first.get(t)
+
             if not(lf):
                 lf = 0
             try:
-                cand = tor.status.pieces.index(False,lf)
-                if (tor.handle.piece_priority(cand) == 0):
-                    prios = tor.handle.piece_priorities()
-                    while (tor.handle.piece_priority(cand) == 0):
-                        cand += 1
-                        pcand = 0
-                        for (i,x) in enumerate(prios[cand:]):
-                            if x > 0:
-                                pcand = i + cand
-                                break
-                        cand = max(tor.status.pieces.index(False,cand), pcand)
-                lf = cand
+                #pick up where we left off in the last looping call
+                i_piece = tor.status.pieces.index(False,lf)
+                prios = tor.handle.piece_priorities()
+
+                #loop until we've marked the next undownloaded piece
+                while (tor.handle.have_piece(i_piece) == True): #downloaded by now
+                    i_piece += 1
+
+                    #find number of pieces after i_piece that are marked for download
+                    #i=index (starting at i_piece), p=priority
+                    for (i,p) in enumerate(prios[i_piece:]):
+                        if p > 0:
+                            i_piece = i + i_piece
+                            break
+
+                j_piece = 0
+                n = 0
+                #loop again and mark __n_extra pieces for higher priority
+                for (i,p) in enumerate(prios[i_piece:]):
+                    if n >= __n_extra:
+                        break
+
+                    if p > 0: #marked for download
+                        j_piece = i + i_piece
+
+                        if (tor.handle.have_piece(j_piece) == False): #not downloaded yet
+                            n += 1
+
+                            if (tor.handle.piece_priority(j_piece) < __target_priority):
+                                tor.handle.piece_priority(j_piece, __target_priority)
+
+                __last_first[t] = i_piece
+
             except ValueError:
                 continue
-            # lf is now the first un-downloaded, desired piece of this torrent
-            if (tor.handle.piece_priority(lf) < __target_priority):
-                tor.handle.piece_priority(lf,__target_priority)
-            __last_first[t] = lf
