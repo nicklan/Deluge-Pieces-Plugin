@@ -47,8 +47,7 @@
       <placeholder/>
     </child>
     <child>
-      <!--<object class="GtkNotebook" id="notebook1">-->
-      <object class="GtkBox" id="vbox1">
+      <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
@@ -56,18 +55,22 @@
           <object class="GtkScrolledWindow" id="pieces_tab">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="border_width">5</property>
-            <property name="vscrollbar_policy">always</property>
-            <property name="kinetic_scrolling">False</property>
+            <property name="shadow_type">in</property>
             <child>
               <placeholder/>
             </child>
           </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <object class="GtkBox" id="pieces_tab_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel" id="pieces_tab_label_label">
                 <property name="visible">True</property>
@@ -75,16 +78,26 @@
                 <property name="label" translatable="yes">Pieces</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
           </object>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
             <property name="position">1</property>
-            <property name="tab_fill">False</property>
           </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>
