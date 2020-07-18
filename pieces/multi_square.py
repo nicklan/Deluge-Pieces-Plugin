@@ -52,7 +52,6 @@ log = logging.getLogger(__name__)
 class MultiSquare(Gtk.DrawingArea):
     def __init__(self, num_squares=0, display=None, menu=None):
         super(MultiSquare, self).__init__()
-        # Gtk.DrawingArea.__init__(self)
 
         self.colors = None
         self.num_squares = num_squares

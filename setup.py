@@ -42,7 +42,7 @@ from __future__ import absolute_import
 from setuptools import setup
 
 __plugin_name__ = "Pieces"
-__author__ = "Nick Lanham test"
+__author__ = "Nick Lanham"
 __author_email__ = "nick@afternight.org"
 __version__ = "0.6"
 __url__ = "https://github.com/nicklan/Deluge-Pieces-Plugin"
