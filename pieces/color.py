@@ -1,5 +1,5 @@
 #
-# common.py
+# color.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
 #
@@ -37,12 +37,19 @@
 #    statement from all source files in the program, then also delete it here.
 #
 
-from __future__ import unicode_literals
+import gi
 
-import os.path
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk
 
-from pkg_resources import resource_filename
 
+class Color:
+    def __init__(self, value):
+        self.parsed_color = Gdk.color_parse(value)
+        self.value = value
 
-def get_resource(filename):
-    return resource_filename(__package__, os.path.join('data', filename))
+    def get_value(self):
+        return self.value
+
+    def get_color(self):
+        return self.parsed_color

@@ -36,6 +36,7 @@
 #    this exception statement from your version. If you delete this exception
 #    statement from all source files in the program, then also delete it here.
 
+from __future__ import absolute_import
 from deluge.ui.client import client
 import deluge.component as component
 

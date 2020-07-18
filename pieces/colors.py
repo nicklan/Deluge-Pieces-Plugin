@@ -1,5 +1,5 @@
 #
-# common.py
+# colors.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
 #
@@ -37,12 +37,31 @@
 #    statement from all source files in the program, then also delete it here.
 #
 
-from __future__ import unicode_literals
-
-import os.path
-
-from pkg_resources import resource_filename
+from .color import Color
 
 
-def get_resource(filename):
-    return resource_filename(__package__, os.path.join('data', filename))
+class Colors:
+
+    def __init__(self, config):
+        self.config = config
+
+        self.not_downloaded_color = Color(config['not_dled_color'])
+        self.downloaded_color = Color(config['dled_color'])
+        self.downloading_color = Color(config['dling_color'])
+        self.hover_border = Color(config['hover_border'])
+        self.selected_border = Color(config['selected_border'])
+
+    def get_not_downloaded_color(self):
+        return self.not_downloaded_color
+
+    def get_downloaded_color(self):
+        return self.downloaded_color
+
+    def get_downloading_color(self):
+        return self.downloading_color
+
+    def get_hover_border(self):
+        return self.hover_border
+
+    def get_selected_border(self):
+        return self.selected_border
