@@ -54,6 +54,8 @@ class MultiSquare(Gtk.DrawingArea):
         super(MultiSquare, self).__init__()
 
         self.colors = None
+        self.square_size = 10
+        self.square_border_size = 4
         self.num_squares = num_squares
         self.selected = {}
         self.last_selected = -1
@@ -79,7 +81,6 @@ class MultiSquare(Gtk.DrawingArea):
         self.connect("button-release-event", self.button_release_event_handler)
 
     def mouse_hover_handler(self, widget, event):
-
         if (self.button1_in):
             # set the draged over square selected
             idx = self.get_index(event.x, event.y)
@@ -123,7 +124,6 @@ class MultiSquare(Gtk.DrawingArea):
         return True
 
     def button_press_event_handler(self, widget, event):
-
         if (event.button == 3 and self.menu != None):
             self.last_selected = self.get_index(event.x, event.y)
             self.selected[self.last_selected] = True
@@ -160,10 +160,8 @@ class MultiSquare(Gtk.DrawingArea):
         return False
 
     def get_index(self, x, y):
-        rowHeight = 15
-        columnWidth = 15
-        row = int(y / rowHeight)
-        column = int(x / columnWidth)
+        row = int(y / self.get_cell_size())
+        column = int(x / self.get_cell_size())
 
         index = self.squares_per_row * row + column
 
@@ -171,6 +169,14 @@ class MultiSquare(Gtk.DrawingArea):
 
     def set_colors(self, colors):
         self.colors = colors
+        self.queue_draw()
+
+    def set_square_size(self, square_size):
+        self.square_size = square_size
+        self.queue_draw()
+
+    def set_square_border_size(self, square_border_size):
+        self.square_border_size = square_border_size
         self.queue_draw()
 
     def clear(self):
@@ -209,7 +215,7 @@ class MultiSquare(Gtk.DrawingArea):
                 color = self.get_color(0)
 
             cairoContext.set_source_rgb(color.red_float, color.green_float, color.blue_float)
-            cairoContext.rectangle(x, y, 10, 10)
+            cairoContext.rectangle(x, y, self.square_size, self.square_size)
 
             if not self.is_selected(square) and not self.is_hovered(square):
                 cairoContext.fill()
@@ -220,21 +226,25 @@ class MultiSquare(Gtk.DrawingArea):
                     color = self.colors.get_selected_border().get_color()
 
                 cairoContext.fill_preserve()
-                cairoContext.set_line_width(4)
+                cairoContext.set_line_width(self.square_border_size)
                 cairoContext.set_source_rgb(color.red_float, color.green_float, color.blue_float)
                 cairoContext.stroke()
 
-            x = x + 15
+            margin = self.get_cell_size()
+            x = x + margin
             if (x > rect.width):
                 if self.squares_per_row == 0:
                     self.squares_per_row = square + 1
                 x = 0
-                y = y + 15
+                y = y + margin
 
             if y > rect.height:
-                widget.set_size_request(rect.width, y + 15)
+                widget.set_size_request(rect.width, y + margin)
 
         return False
+
+    def get_cell_size(self):
+        return self.square_border_size + self.square_size + 1
 
     def is_selected(self, square):
         return square in self.selected

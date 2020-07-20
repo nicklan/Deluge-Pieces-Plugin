@@ -53,7 +53,9 @@ DEFAULT_PREFS = {
     "dled_color":"#FF0000",
     "dling_color":"#0000FF",
     "selected_border":"#e04a02",
-    "hover_border":"#5a5a5a"
+    "hover_border":"#5a5a5a",
+    "square_size": 10,
+    "square_border_size": 4
 }
 
 class Core(CorePluginBase):

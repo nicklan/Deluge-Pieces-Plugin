@@ -115,8 +115,10 @@ class PiecesTab(Tab):
         return False
 
 
-    def setColors(self,colors):
-        self._ms.set_colors(colors)
+    def set_config(self, config):
+        self._ms.set_colors(Colors(config))
+        self._ms.set_square_size(config['square_size'])
+        self._ms.set_square_border_size(config['square_border_size'])
 
     def clear(self):
         self._ms.clear()
@@ -152,10 +154,9 @@ class PiecesTab(Tab):
 
 
     def update(self):
-        # # Get the first selected torrent
+        # Get the first selected torrent
         selected = component.get("TorrentView").get_selected_torrents()
-        #
-        # # Only use the first torrent in the list or return if None selected
+        # Only use the first torrent in the list or return if None selected
         if len(selected) != 0:
             selected = selected[0]
             if(selected != self._current):
@@ -182,7 +183,7 @@ class GtkUI(Gtk3PluginBase):
         self.builder_cfg.add_from_file(get_resource('config.ui'))
 
         component.get("TorrentDetails").add_tab(self._pieces_tab)
-        client.pieces.get_config().addCallback(self.set_colors)
+        client.pieces.get_config().addCallback(self.set_config)
 
         component.get("Preferences").add_page("Pieces", self.builder_cfg.get_object("prefs_box"))
         component.get("PluginManager").register_hook("on_apply_prefs", self.on_apply_prefs)
@@ -201,12 +202,15 @@ class GtkUI(Gtk3PluginBase):
             "dled_color":self.builder_cfg.get_object("dl_button").get_color().to_string(),
             "dling_color":self.builder_cfg.get_object("dling_button").get_color().to_string(),
             "hover_border": self.builder_cfg.get_object("hover_border").get_color().to_string(),
-            "selected_border": self.builder_cfg.get_object("selected_border").get_color().to_string()
+            "selected_border": self.builder_cfg.get_object("selected_border").get_color().to_string(),
+            "square_size": self.builder_cfg.get_object("square_size").get_value(),
+            "square_border_size": self.builder_cfg.get_object("square_border_size").get_value()
         }
         client.pieces.set_config(config)
-        client.pieces.get_config().addCallback(self.set_colors)
+        client.pieces.get_config().addCallback(self.set_config)
 
     def on_show_prefs(self):
+
         client.pieces.get_config().addCallback(self.cb_get_config)
 
     def cb_get_config(self, config):
@@ -216,6 +220,10 @@ class GtkUI(Gtk3PluginBase):
         self.builder_cfg.get_object("dling_button").set_color(Gdk.color_parse(config["dling_color"]))
         self.builder_cfg.get_object("hover_border").set_color(Gdk.color_parse(config["hover_border"]))
         self.builder_cfg.get_object("selected_border").set_color(Gdk.color_parse(config["selected_border"]))
+        self.builder_cfg.get_object("square_size").\
+            configure(Gtk.Adjustment(config["square_size"], 5, 100, 1, 0, 0), 1, 0)
+        self.builder_cfg.get_object("square_border_size"). \
+            configure(Gtk.Adjustment(config["square_border_size"], 0, 100, 1, 0, 0), 1, 0)
 
-    def set_colors(self, config):
-        self._pieces_tab.setColors(Colors(config))
+    def set_config(self, config):
+        self._pieces_tab.set_config(config)

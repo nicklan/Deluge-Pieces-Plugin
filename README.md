@@ -47,6 +47,7 @@ install plugin and select the .egg file.
 * Ported to Python 3, Deluge 2 and Gtk 3.
 * Dropped support for Python 2, Deluge 1, And Gtk 2.
 * Added borders color option for selected and hovered pieces.
+* Added options for setting square size
 
 ## Version 0.6
 * Added streaming of more than 1 piece (set to 15)
