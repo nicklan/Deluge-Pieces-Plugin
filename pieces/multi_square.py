@@ -199,7 +199,6 @@ class MultiSquare(Gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self, widget, cairoContext):
-
         rect = widget.get_allocation()
         first = 0
         last = self.num_squares

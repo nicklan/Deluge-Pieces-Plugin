@@ -42,7 +42,6 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk
 
-
 class Color:
     def __init__(self, value):
         self.parsed_color = Gdk.color_parse(value)

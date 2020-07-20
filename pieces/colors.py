@@ -41,7 +41,6 @@ from .color import Color
 
 
 class Colors:
-
     def __init__(self, config):
         self.config = config
 
