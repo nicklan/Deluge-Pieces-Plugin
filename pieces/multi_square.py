@@ -81,7 +81,7 @@ class MultiSquare(Gtk.DrawingArea):
         self.connect("button-release-event", self.button_release_event_handler)
 
     def mouse_hover_handler(self, widget, event):
-        if (self.button1_in):
+        if self.button1_in:
             # set the draged over square selected
             idx = self.get_index(event.x, event.y)
             if (idx >= self.num_squares):
@@ -96,7 +96,7 @@ class MultiSquare(Gtk.DrawingArea):
         square = self.get_index(x, y)
         self.hovered_square = square
 
-        if (square >= self.num_squares):
+        if square >= self.num_squares:
             return False
 
         def __qtt_callback(args):
@@ -124,7 +124,7 @@ class MultiSquare(Gtk.DrawingArea):
         return True
 
     def button_press_event_handler(self, widget, event):
-        if (event.button == 3 and self.menu != None):
+        if event.button == 3 and self.menu != None:
             self.last_selected = self.get_index(event.x, event.y)
             self.selected[self.last_selected] = True
             self.menu.popup(None,
@@ -136,10 +136,10 @@ class MultiSquare(Gtk.DrawingArea):
 
         # set button in true
         # clear the current selection and set this square as selected
-        if (event.button == 1):
+        if event.button == 1:
             self.button1_in = True
             index = self.get_index(event.x, event.y)
-            if ((event.state & Gdk.ModifierType.SHIFT_MASK) and (self.last_selected != -1)):
+            if (event.state & Gdk.ModifierType.SHIFT_MASK) and (self.last_selected != -1):
                 end = min(index, self.num_squares)
                 for i in range(self.last_selected, end):
                     self.selected[i] = True
@@ -154,7 +154,7 @@ class MultiSquare(Gtk.DrawingArea):
         return False
 
     def button_release_event_handler(self, widget, event):
-        if (event.button == 1):
+        if event.button == 1:
             self.button1_in = False
 
         return False
@@ -232,7 +232,7 @@ class MultiSquare(Gtk.DrawingArea):
 
             margin = self.get_cell_size()
             x = x + margin
-            if (x > rect.width):
+            if x > rect.width:
                 if self.squares_per_row == 0:
                     self.squares_per_row = square + 1
                 x = 0

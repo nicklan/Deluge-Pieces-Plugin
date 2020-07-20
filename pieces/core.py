@@ -60,7 +60,6 @@ DEFAULT_PREFS = {
 
 class Core(CorePluginBase):
     def enable(self):
-
         self.config = deluge.configmanager.ConfigManager("pieces.conf", DEFAULT_PREFS)
         self.colors = Colors(self.config)
         self.priority_loop = None

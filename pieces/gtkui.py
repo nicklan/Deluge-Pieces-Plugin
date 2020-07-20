@@ -88,7 +88,6 @@ class PiecesTab(Tab):
 
         self._showed_prio_warn = False
 
-
     def onPrioTogg(self,widget):
         if (self._current):
             if (widget.get_active()):
@@ -112,8 +111,8 @@ class PiecesTab(Tab):
                                "Using this option for torrents with an unhealthy swarm is rather unsocial and not particularly good for the swarm.\n\nPlease use with care.")
         md.connect('response', self.__dest)
         md.show_all()
-        return False
 
+        return False
 
     def set_config(self, config):
         self._ms.set_colors(Colors(config))
@@ -152,7 +151,6 @@ class PiecesTab(Tab):
             else:
                 self._ms.set_square_color(i, 0)
 
-
     def update(self):
         # Get the first selected torrent
         selected = component.get("TorrentView").get_selected_torrents()
@@ -169,7 +167,6 @@ class PiecesTab(Tab):
             return
 
         client.pieces.get_torrent_info(selected).addCallback(self.__update_callback)
-
 
 
 class GtkUI(Gtk3PluginBase):
