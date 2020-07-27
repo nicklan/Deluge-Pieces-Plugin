@@ -38,6 +38,7 @@
 #    statement from all source files in the program, then also delete it here.
 #
 
+from __future__ import absolute_import
 from setuptools import setup
 
 __plugin_name__ = "Pieces"
@@ -93,7 +94,7 @@ setup(
     entry_points="""
     [deluge.plugin.core]
     %s = %s:CorePlugin
-    [deluge.plugin.gtkui]
+    [deluge.plugin.gtk3ui]
     %s = %s:GtkUIPlugin
     [deluge.plugin.web]
     %s = %s:WebUIPlugin

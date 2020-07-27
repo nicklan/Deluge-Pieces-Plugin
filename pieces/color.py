@@ -1,5 +1,5 @@
 #
-# webui.py
+# color.py
 #
 # Copyright (C) 2009 Nick Lanham <nick@afternight.org>
 #
@@ -37,11 +37,18 @@
 #    statement from all source files in the program, then also delete it here.
 #
 
-from __future__ import absolute_import
-from deluge.plugins.pluginbase import WebPluginBase
+import gi
 
-from .common import get_resource
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk
 
-class WebUI(WebPluginBase):
+class Color:
+    def __init__(self, value):
+        self.parsed_color = Gdk.color_parse(value)
+        self.value = value
 
-    scripts = [get_resource("pieces.js")]
+    def get_value(self):
+        return self.value
+
+    def get_color(self):
+        return self.parsed_color

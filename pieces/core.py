@@ -37,37 +37,43 @@
 #    statement from all source files in the program, then also delete it here.
 #
 
+from __future__ import absolute_import
 from deluge.log import LOG as log
 from deluge.plugins.pluginbase import CorePluginBase
 import deluge.component as component
 import deluge.configmanager
 from deluge.core.rpcserver import export
-
 from twisted.internet.task import LoopingCall, deferLater
 from twisted.internet import reactor
-from priority_thread import priority_loop
+from .priority_thread import priority_loop
+from .colors import Colors
 
 DEFAULT_PREFS = {
     "not_dled_color":"#000000",
     "dled_color":"#FF0000",
-    "dling_color":"#0000FF"
+    "dling_color":"#0000FF",
+    "selected_border":"#e04a02",
+    "hover_border":"#5a5a5a",
+    "square_size": 10,
+    "square_border_size": 4
 }
 
 class Core(CorePluginBase):
     def enable(self):
         self.config = deluge.configmanager.ConfigManager("pieces.conf", DEFAULT_PREFS)
-        self.not_dled_color = self.config['not_dled_color']
-        self.dled_color = self.config['dled_color']
-        self.dling_color = self.config['dling_color']
+        self.colors = Colors(self.config)
         self.priority_loop = None
         self.priority_torrents = {}
         deferLater(reactor, 5, self.enable_priority_loop)
+        log.info("Pieces plugin enabled")
+        self.config.save()
 
     def enable_priority_loop(self):
         self.priority_loop = LoopingCall(priority_loop,self.get_priority_torrents)
         self.priority_loop.start(2)
 
     def disable(self):
+        log.info("Pieces plugin disabled")
         if self.priority_loop and self.priority_loop.running:
             self.priority_loop.stop()
 
@@ -93,7 +99,7 @@ class Core(CorePluginBase):
             if peer.downloading_piece_index != -1:
                 curdl.append(peer.downloading_piece_index)
 
-        curdl = dict.fromkeys(curdl).keys() 
+        curdl = list(dict.fromkeys(curdl).keys())
         curdl.sort()
 
         return (False, plen, stat.pieces, curdl)
@@ -105,7 +111,7 @@ class Core(CorePluginBase):
     @export
     def piece_priorities(self, selected, priority):
         for i in selected:
-            if selected[i]: 
+            if selected[i]:
                 self.__handle_cache.piece_priority(i,priority)
 
     @export
