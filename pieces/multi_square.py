@@ -202,9 +202,11 @@ class MultiSquare(Gtk.DrawingArea):
         rect = widget.get_allocation()
         first = 0
         last = self.num_squares
+        columns = 0
         x = 0
         y = 0
-        self.squares_per_row = 0
+        cell_size = self.get_cell_size()
+        self.squares_per_row = int(rect.width / cell_size)
 
         for square in range(first, last):
 
@@ -229,16 +231,15 @@ class MultiSquare(Gtk.DrawingArea):
                 cairoContext.set_source_rgb(color.red_float, color.green_float, color.blue_float)
                 cairoContext.stroke()
 
-            margin = self.get_cell_size()
-            x = x + margin
-            if x > rect.width:
-                if self.squares_per_row == 0:
-                    self.squares_per_row = square + 1
+            x = x + cell_size
+            columns = columns + 1
+            if columns == self.squares_per_row:
+                columns = 0
                 x = 0
-                y = y + margin
+                y = y + cell_size
 
             if y > rect.height:
-                widget.set_size_request(rect.width, y + margin)
+                widget.set_size_request(rect.width, y + cell_size)
 
         return False
 
