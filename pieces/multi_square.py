@@ -84,7 +84,7 @@ class MultiSquare(Gtk.DrawingArea):
         if self.button1_in:
             # set the draged over square selected
             idx = self.get_index(event.x, event.y)
-            if (idx >= self.num_squares):
+            if idx == -1:
                 return
             self.selected[idx] = True
             self.last_selected = idx
@@ -96,7 +96,7 @@ class MultiSquare(Gtk.DrawingArea):
         square = self.get_index(x, y)
         self.hovered_square = square
 
-        if square >= self.num_squares:
+        if square == -1:
             return False
 
         def __qtt_callback(args):
@@ -125,8 +125,11 @@ class MultiSquare(Gtk.DrawingArea):
 
     def button_press_event_handler(self, widget, event):
         if event.button == 3 and self.menu != None:
-            self.last_selected = self.get_index(event.x, event.y)
-            self.selected[self.last_selected] = True
+            index = self.get_index(event.x, event.y)
+            if index == -1:
+                return False
+            self.last_selected = index
+            self.selected[index] = True
             self.menu.popup(None,
                             None,
                             None,
@@ -140,13 +143,13 @@ class MultiSquare(Gtk.DrawingArea):
             self.button1_in = True
             index = self.get_index(event.x, event.y)
             if (event.state & Gdk.ModifierType.SHIFT_MASK) and (self.last_selected != -1):
-                end = min(index, self.num_squares)
-                for i in range(self.last_selected, end):
-                    self.selected[i] = True
+                if index != -1:
+                    for i in range(self.last_selected, index):
+                        self.selected[i] = True
             else:
                 if not (event.state & Gdk.ModifierType.CONTROL_MASK):
                     self.reset_selected()
-                if index < self.num_squares:
+                if index != -1:
                     self.selected[index] = True
                     self.last_selected = index
             self.queue_draw()
@@ -160,12 +163,18 @@ class MultiSquare(Gtk.DrawingArea):
         return False
 
     def get_index(self, x, y):
-        row = int(y / self.get_cell_size())
-        column = int(x / self.get_cell_size())
+        cell_size = self.get_cell_size()
+        row_len = self.squares_per_row * cell_size
+        if x < row_len:
+            rows = int(y / cell_size)
+            columns = int(x / cell_size)
 
-        index = self.squares_per_row * row + column
+            index = self.squares_per_row * rows + columns
 
-        return index
+            if index < self.num_squares:
+                return index
+
+        return -1
 
     def set_colors(self, colors):
         self.colors = colors
