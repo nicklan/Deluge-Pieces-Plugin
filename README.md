@@ -43,6 +43,10 @@ install plugin and select the .egg file.
 
 # Version Info
 
+## Version 1.0.1
+* Fixed incorrect drawing of partial squares on ends of rows.
+* Improved right-click selection behaviour.
+
 ## Version 1.0
 * Ported to Python 3, Deluge 2 and Gtk 3.
 * Dropped support for Python 2, Deluge 1, And Gtk 2.
