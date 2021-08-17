@@ -46,6 +46,7 @@ install plugin and select the .egg file.
 ## Version 1.0.1
 * Fixed incorrect drawing of partial squares on ends of rows.
 * Improved right-click selection behaviour.
+* Fixed non-shrinking drawing area upon changing torrent selection.
 
 ## Version 1.0
 * Ported to Python 3, Deluge 2 and Gtk 3.

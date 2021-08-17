@@ -220,6 +220,12 @@ class MultiSquare(Gtk.DrawingArea):
         cell_size = self.get_cell_size()
         self.squares_per_row = int(rect.width / cell_size)
 
+        rows = int(self.num_squares / self.squares_per_row)
+        if (rows * self.squares_per_row) != self.num_squares:
+            rows = rows + 1
+
+        widget.set_size_request(rect.width, rows * cell_size)
+
         for square in range(first, last):
 
             try:
@@ -249,9 +255,6 @@ class MultiSquare(Gtk.DrawingArea):
                 columns = 0
                 x = 0
                 y = y + cell_size
-
-            if y > rect.height:
-                widget.set_size_request(rect.width, y + cell_size)
 
         return False
 
