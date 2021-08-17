@@ -128,8 +128,11 @@ class MultiSquare(Gtk.DrawingArea):
             index = self.get_index(event.x, event.y)
             if index == -1:
                 return False
+            if not self.is_selected(index):
+                if not (event.state & (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK)):
+                    self.reset_selected()
+                self.selected[index] = True
             self.last_selected = index
-            self.selected[index] = True
             self.menu.popup(None,
                             None,
                             None,
