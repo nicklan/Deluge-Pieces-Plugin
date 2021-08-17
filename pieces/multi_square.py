@@ -215,8 +215,14 @@ class MultiSquare(Gtk.DrawingArea):
         first = 0
         last = self.num_squares
         columns = 0
-        x = 0
-        y = 0
+        # half of the width of the border overlaps with the square; we must thus draw the squares
+        # half of the border width away from the edge in order to avoid borders adjacent to the top
+        # and left edges being partially hidden.
+        offset = int(self.square_border_size / 2)
+        if self.square_border_size & 1:
+            offset = offset + 1
+        x = offset
+        y = offset
         cell_size = self.get_cell_size()
         self.squares_per_row = int(rect.width / cell_size)
 
@@ -253,7 +259,7 @@ class MultiSquare(Gtk.DrawingArea):
             columns = columns + 1
             if columns == self.squares_per_row:
                 columns = 0
-                x = 0
+                x = offset
                 y = y + cell_size
 
         return False
