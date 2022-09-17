@@ -62,11 +62,11 @@ Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
 			deluge.client.pieces.get_config({
 					success: function(config) {
 						var ctmp = config['dling_color'].split("");
-						this.dlingColor = "#"+ctmp[1]+ctmp[2]+ctmp[3]+ctmp[4]+ctmp[5]+ctmp[6];
+						this.dlingColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
 						ctmp = config['dled_color'].split("");
-						this.dledColor = "#"+ctmp[1]+ctmp[2]+ctmp[3]+ctmp[4]+ctmp[5]+ctmp[6];
+						this.dledColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
 						ctmp = config['not_dled_color'].split("");
-						this.notDledColor = "#"+ctmp[1]+ctmp[2]+ctmp[3]+ctmp[4]+ctmp[5]+ctmp[6];
+						this.notDledColor = "#"+ctmp[1]+ctmp[2]+ctmp[5]+ctmp[6]+ctmp[9]+ctmp[10];
 					},
 					scope: this
 				});
