@@ -66,33 +66,15 @@
             <property name="position">0</property>
           </packing>
         </child>
-        <child>
-          <object class="GtkBox" id="pieces_tab_label">
+        <child type="tab">
+          <object class="GtkLabel" id="pieces_tab_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel" id="pieces_tab_label_label">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Pieces</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
+            <property name="label" translatable="yes">Pieces</property>
+            <property name="use_underline">True</property>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
+            <property name="tab_fill">False</property>
             <property name="position">1</property>
           </packing>
         </child>
