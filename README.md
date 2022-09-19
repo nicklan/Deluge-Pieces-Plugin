@@ -43,6 +43,10 @@ install plugin and select the .egg file.
 
 # Version Info
 
+## Version 1.0.2
+* Removed Gtk dependency for environments with no Gtk available.
+* Cosmetic bugfixes.
+
 ## Version 1.0.1
 * Fixed incorrect drawing of partial squares on ends of rows.
 * Improved right-click selection behaviour.

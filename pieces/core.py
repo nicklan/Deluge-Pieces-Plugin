@@ -46,14 +46,13 @@ from deluge.core.rpcserver import export
 from twisted.internet.task import LoopingCall, deferLater
 from twisted.internet import reactor
 from .priority_thread import priority_loop
-from .colors import Colors
 
 DEFAULT_PREFS = {
-    "not_dled_color":"#000000",
-    "dled_color":"#FF0000",
-    "dling_color":"#0000FF",
-    "selected_border":"#e04a02",
-    "hover_border":"#5a5a5a",
+    "not_dled_color":"#000000000000",
+    "dled_color":"#FFFF00000000",
+    "dling_color":"#00000000FFFF",
+    "selected_border":"#e0e04a4a0202",
+    "hover_border":"#5a5a5a5a5a5a",
     "square_size": 10,
     "square_border_size": 4
 }
@@ -61,7 +60,7 @@ DEFAULT_PREFS = {
 class Core(CorePluginBase):
     def enable(self):
         self.config = deluge.configmanager.ConfigManager("pieces.conf", DEFAULT_PREFS)
-        self.colors = Colors(self.config)
+        self.colors = None
         self.priority_loop = None
         self.priority_torrents = {}
         deferLater(reactor, 5, self.enable_priority_loop)
