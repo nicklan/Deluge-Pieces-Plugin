@@ -39,7 +39,6 @@ Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
 
 		constructor: function() {
 			Deluge.pieces.PiecesTab.superclass.constructor.call(this);
-			this.updateConfig();
 			this.tdtpl = new Ext.Template('<td id="ptd{0}" title="Piece {0}" style="background-color:{1};" width="8" height="10"></td>');
 			this.tdtpl.compile();
 			this.trtpl = new Ext.Template('<tr id="{id}"></tr>');
@@ -127,6 +126,7 @@ Deluge.pieces.PiecesTab = Ext.extend(Ext.Panel, {
 
 		onTorrentInfo: function(info) {
 			if (this.needRebuild) {
+				this.updateConfig();
 				this.buildTable(info[1],info[0],info[2],info[3]);
 				this.needRebuild = false;
 				this.lastDone = info[0];
